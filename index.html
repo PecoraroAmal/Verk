@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Verk - Organise all your works in one place">
+    <meta name="theme-color" content="#2c3e50">
+    <title>Verk - Your Works Collection</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/png" href="icon-192.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Verk</h1>
+            <p class="subtitle">Organise all your works in one place</p>
+        </header>
+
+        <div class="controls">
+            <button id="addWorkBtn" class="btn btn-primary">+ Add Work</button>
+            <button id="importBtn" class="btn btn-secondary">Import JSON</button>
+            <button id="exportBtn" class="btn btn-secondary">Export JSON</button>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="films">Films</button>
+            <button class="filter-btn" data-category="tv-series">TV Series</button>
+            <button class="filter-btn" data-category="anime">Anime</button>
+            <button class="filter-btn" data-category="cartoons">Cartoons</button>
+            <button class="filter-btn" data-category="books">Books</button>
+            <button class="filter-btn" data-category="manga">Manga</button>
+        </div>
+
+        <div id="worksList" class="works-list"></div>
+    </div>
+
+    <!-- Add/Edit Work Modal -->
+    <div id="workModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Add Work</h2>
+            <form id="workForm">
+                <div class="form-group">
+                    <label for="workCategory">Category *</label>
+                    <select id="workCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="films">Films</option>
+                        <option value="tv-series">TV Series</option>
+                        <option value="anime">Anime</option>
+                        <option value="cartoons">Cartoons</option>
+                        <option value="books">Books</option>
+                        <option value="manga">Manga</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="workTitle">Title *</label>
+                    <input type="text" id="workTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="workCreator">Creator/Author/Director</label>
+                    <input type="text" id="workCreator">
+                </div>
+                <div class="form-group">
+                    <label for="workYear">Year</label>
+                    <input type="number" id="workYear" min="1800" max="2100">
+                </div>
+                <div class="form-group">
+                    <label for="workStatus">Status</label>
+                    <select id="workStatus">
+                        <option value="plan-to-watch">Plan to Watch/Read</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="on-hold">On Hold</option>
+                        <option value="dropped">Dropped</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="workRating">Rating (1-10)</label>
+                    <input type="number" id="workRating" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label for="workNotes">Notes</label>
+                    <textarea id="workNotes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Import JSON Modal -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Import JSON</h2>
+            <div class="form-group">
+                <label for="jsonInput">Paste JSON data:</label>
+                <textarea id="jsonInput" rows="10" placeholder='[{"id": "1", "category": "films", "title": "Example Film", ...}]'></textarea>
+            </div>
+            <div class="form-actions">
+                <button id="importConfirmBtn" class="btn btn-primary">Import</button>
+                <button id="importCancelBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
