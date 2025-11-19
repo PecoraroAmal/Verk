@@ -459,14 +459,6 @@ const popularFilms = [
         colour: "#1C1C1C"
     },
     {
-        name: "The Dark Knight",
-        category: "films",
-        rating: 9.0,
-        status: "watched",
-        note: "Batman trilogy",
-        colour: "#1A1A1A"
-    },
-    {
         name: "Pulp Fiction",
         category: "films",
         rating: 8.9,
@@ -546,31 +538,6 @@ const popularFilms = [
         status: "watched",
         note: "Emotional journey",
         colour: "#FFD700"
-    },
-    // Studio Ghibli
-    {
-        name: "Spirited Away",
-        category: "films",
-        rating: 8.6,
-        status: "watched",
-        note: "Studio Ghibli",
-        colour: "#98D8C8"
-    },
-    {
-        name: "My Neighbour Totoro",
-        category: "films",
-        rating: 8.1,
-        status: "watched",
-        note: "Studio Ghibli",
-        colour: "#7CB342"
-    },
-    {
-        name: "Princess Mononoke",
-        category: "films",
-        rating: 8.3,
-        status: "watched",
-        note: "Studio Ghibli",
-        colour: "#8B4513"
     },
     // Christopher Nolan Films
     {

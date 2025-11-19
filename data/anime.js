@@ -160,6 +160,31 @@ const popularAnime = [
         note: "Comedy action",
         colour: "#FF69B4"
     },
+    // Hayao Miyazaki saga
+    {
+        name: "Spirited Away",
+        category: "anime",
+        rating: 8.6,
+        status: "watched",
+        note: "Hayao Miyazaki saga",
+        colour: "#98D8C8"
+    },
+    {
+        name: "My Neighbour Totoro",
+        category: "anime",
+        rating: 8.1,
+        status: "watched",
+        note: "Hayao Miyazaki saga",
+        colour: "#7CB342"
+    },
+    {
+        name: "Princess Mononoke",
+        category: "anime",
+        rating: 8.3,
+        status: "watched",
+        note: "Hayao Miyazaki saga",
+        colour: "#8B4513"
+    },
     {
         name: "Dragon Ball Z",
         category: "anime",

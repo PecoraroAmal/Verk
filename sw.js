@@ -1,7 +1,7 @@
 const CACHE_NAME = 'verk-v1';
 const urlsToCache = [
-  './?v=3.03',
-  './index.html?v=3.03',
+  './?v=3.04',
+  './index.html?v=3.04',
   './app.js',
   './styles.css',
   './manifest.json',
@@ -75,11 +75,11 @@ self.addEventListener('fetch', event => {
           return fetchAndUpdateCache(event.request);
         }
         // If offline and not in cache, return fallback
-        return caches.match('./index.html?v=3.03');
+        return caches.match('./index.html?v=3.04');
       })
       .catch(error => {
         console.error('Fetch failed:', error);
-        return caches.match('./index.html?v=3.03');
+        return caches.match('./index.html?v=3.04');
       })
   );
 });
