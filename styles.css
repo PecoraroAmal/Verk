@@ -233,6 +233,8 @@ main {
     background-color: var(--surface);
     border-radius: 14px;
     border: 1px solid var(--border-colour);
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .category-icon-btn {
