@@ -637,7 +637,10 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 .btn-text:hover { color: var(--text-primary); }
 
-.popular-modal .modal-content { max-width: 450px; }
+.popular-modal .modal-content {
+    max-width: min(90vw, 450px);
+    width: 100%;
+}
 
 .popular-tabs {
     display: flex;
@@ -648,11 +651,11 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 }
 
 .tab-btn {
-    padding: 0.375rem 0.625rem;
+    padding: 0.25rem 0.375rem;
     border: none;
     background: none;
     color: var(--text-secondary);
-    font-size: 0.45rem;
+    font-size: 0.35rem;
     font-weight: 500;
     cursor: pointer;
     border-bottom: 2px solid transparent;
@@ -688,7 +691,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 .saga-title {
     font-weight: 600;
-    font-size: 0.525rem;
+    font-size: 0.45rem;
     color: var(--text-primary);
     letter-spacing: -0.01em;
 }
@@ -735,6 +738,14 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     background-color: var(--surface);
 }
 
+.popular-item-name {
+    font-weight: 600;
+    font-size: 0.4rem;
+    color: var(--text-primary);
+    margin-bottom: 0.125rem;
+    letter-spacing: -0.01em;
+}
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--background); }
 ::-webkit-scrollbar-thumb { background: var(--border-colour); border-radius: 4px; }
@@ -776,5 +787,24 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     }
     .mobile-install-prompt {
         padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+    }
+}
+
+@media (max-width: 320px) {
+    .popular-modal .modal-content {
+        max-width: 95vw;
+    }
+    .tab-btn {
+        font-size: 0.3rem;
+        padding: 0.2rem 0.3rem;
+    }
+    .saga-title {
+        font-size: 0.4rem;
+    }
+    .popular-item-name {
+        font-size: 0.35rem;
+    }
+    .popular-item {
+        padding: 0.375rem;
     }
 }

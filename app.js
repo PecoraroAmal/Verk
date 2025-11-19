@@ -434,7 +434,6 @@ class VerkApp {
         if (category === 'all') category = 'films';
         
         document.getElementById('quickItemCategory').value = category;
-        document.getElementById('quickItemStatus').value = (category === 'books' || category === 'manga') ? 'to-read' : 'to-watch';
         modal.style.display = 'flex';
         document.body.classList.add('modal-open');
         
