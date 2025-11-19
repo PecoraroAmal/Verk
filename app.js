@@ -561,6 +561,9 @@ class VerkApp {
     // PWA Install
     async installPWA() {
         console.log('Attempting PWA install...');
+        console.log('Browser:', navigator.userAgent);
+        console.log('Protocol:', location.protocol);
+        console.log('Deferred prompt available:', !!this.deferredPrompt);
         
         // Check if we're in a valid installation context
         const isHttpContext = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
@@ -570,9 +573,29 @@ class VerkApp {
             return;
         }
         
+        // Check browser compatibility
+        const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+        const isEdge = /Edg/.test(navigator.userAgent);
+        const isOpera = /OPR/.test(navigator.userAgent);
+        const isSamsung = /SamsungBrowser/.test(navigator.userAgent);
+        
+        if (!isChrome && !isEdge && !isOpera && !isSamsung) {
+            console.log('Browser may not support PWA installation');
+            this.showNotification('PWA installation works best in Chrome, Edge, or Opera. Try a different browser.', 'warning');
+            // Continue anyway in case it works
+        }
+        
         if (!this.deferredPrompt) {
-            console.log('No deferred prompt available');
-            this.showNotification('Installation not available. Try using Chrome or Edge browser.', 'error');
+            console.log('No deferred prompt available - checking alternatives...');
+            
+            // Try alternative installation methods
+            if ('standalone' in window.navigator && window.navigator.standalone === false) {
+                // iOS Safari
+                this.showNotification('On iOS Safari: tap Share → Add to Home Screen', 'info');
+                return;
+            }
+            
+            this.showNotification('Installation not available. Make sure you\'re using Chrome/Edge and the app isn\'t already installed.', 'error');
             return;
         }
 
