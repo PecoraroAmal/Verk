@@ -465,22 +465,16 @@ class VerkApp {
 
     // Data Import/Export
     downloadBlob(filename, dataStr) {
-        // Use data URL for maximum compatibility
-        const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
         
-        const link = document.createElement('a');
-        link.style.display = 'none';
-        link.href = dataUrl;
-        link.download = filename;
-        
-        // Ensure the link is in the DOM
-        document.body.appendChild(link);
-        
-        // Trigger download
-        link.click();
-        
-        // Clean up
-        document.body.removeChild(link);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 
     exportData() {
@@ -578,8 +572,15 @@ class VerkApp {
         const isEdge = /Edg/.test(navigator.userAgent);
         const isOpera = /OPR/.test(navigator.userAgent);
         const isSamsung = /SamsungBrowser/.test(navigator.userAgent);
+        const isBrave = /Brave/.test(navigator.userAgent);
         
-        if (!isChrome && !isEdge && !isOpera && !isSamsung) {
+        console.log('Browser detection:', { isChrome, isEdge, isOpera, isSamsung, isBrave });
+        
+        if (isBrave) {
+            console.log('Brave browser detected - PWA support may be limited');
+            this.showNotification('Brave detected. Enable PWA support: brave://flags/#enable-desktop-pwas → Enable → Restart browser.', 'warning');
+            // Continue anyway in case it works
+        } else if (!isChrome && !isEdge && !isOpera && !isSamsung) {
             console.log('Browser may not support PWA installation');
             this.showNotification('PWA installation works best in Chrome, Edge, or Opera. Try a different browser.', 'warning');
             // Continue anyway in case it works
