@@ -817,6 +817,17 @@ textarea.form-control {
     .btn-primary, .btn-icon, .btn-install {
         font-size: 0.85rem;
     }
+
+    .category-filter-icons {
+        gap: 0.25rem;
+        padding: 0.125rem;
+    }
+
+    .category-icon-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
 }
 
 /* Loading Animation */
