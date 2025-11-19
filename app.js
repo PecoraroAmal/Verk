@@ -270,11 +270,12 @@ class VerkApp {
         // PWA install
         window.addEventListener('beforeinstallprompt', (e) => {
             console.log('beforeinstallprompt event fired');
-            e.preventDefault();
-            this.deferredPrompt = e;
-            document.getElementById('installPWABtn').style.display = 'flex';
-            document.getElementById('installBtn').style.display = 'inline-flex';
-            document.getElementById('installMessage').style.display = 'none';
+            // Do not prevent default to allow browser's native install prompt
+            // e.preventDefault();
+            // this.deferredPrompt = e;
+            // document.getElementById('installPWABtn').style.display = 'flex';
+            // document.getElementById('installBtn').style.display = 'inline-flex';
+            // document.getElementById('installMessage').style.display = 'none';
             
             // If mobile prompt is showing, update it
             const mobilePrompt = document.getElementById('mobileInstallPrompt');
@@ -290,7 +291,7 @@ class VerkApp {
         // Fired when the app is installed (user accepted the prompt)
         window.addEventListener('appinstalled', (evt) => {
             console.log('PWA was installed', evt);
-            this.deferredPrompt = null;
+            // No deferredPrompt to clear since we don't prevent the prompt
             const pwaBtn = document.getElementById('installPWABtn');
             const installBtn = document.getElementById('installBtn');
             const installMsg = document.getElementById('installMessage');
@@ -594,7 +595,7 @@ class VerkApp {
 
     // PWA Install
     async installPWA() {
-        console.log('Attempting PWA install...');
+        console.log('Install PWA requested...');
         console.log('Browser:', navigator.userAgent);
         console.log('Protocol:', location.protocol);
         console.log('Deferred prompt available:', !!this.deferredPrompt);
@@ -619,61 +620,56 @@ class VerkApp {
         if (isBrave) {
             console.log('Brave browser detected - PWA support may be limited');
             this.showNotification('Brave detected. Enable PWA support: brave://flags/#enable-desktop-pwas → Enable → Restart browser.', 'warning');
-            // Continue anyway in case it works
+            return;
         } else if (!isChrome && !isEdge && !isOpera && !isSamsung) {
             console.log('Browser may not support PWA installation');
             this.showNotification('PWA installation works best in Chrome, Edge, or Opera. Try a different browser.', 'warning');
-            // Continue anyway in case it works
-        }
-        
-        if (!this.deferredPrompt) {
-            console.log('No deferred prompt available - checking alternatives...');
-            
-            // Check if already installed
-            const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
-                              (window.navigator.standalone === true) ||
-                              document.referrer.includes('android-app://');
-            
-            if (isInstalled) {
-                console.log('App appears to be already installed');
-                this.showNotification('App appears to be already installed. Check your home screen or app drawer.', 'info');
-                return;
-            }
-            
-            // Try alternative installation methods
-            if ('standalone' in window.navigator && window.navigator.standalone === false) {
-                // iOS Safari
-                this.showNotification('On iOS Safari: tap Share → Add to Home Screen', 'info');
-                return;
-            }
-            
-            // Browser-specific messages
-            if (isBrave) {
-                this.showNotification('PWA installation in Brave requires enabling the flag. Check the previous message.', 'error');
-            } else {
-                this.showNotification('Installation not available. Make sure you\'re using Chrome/Edge and the app isn\'t already installed.', 'error');
-            }
             return;
         }
-
-        try {
-            this.deferredPrompt.prompt();
-            const { outcome } = await this.deferredPrompt.userChoice;
-            console.log('Install outcome:', outcome);
-            
-            if (outcome === 'accepted') {
-                console.log('PWA installed successfully');
-                this.showNotification('App installed successfully!', 'success');
-            } else {
-                console.log('PWA install dismissed');
-                this.showNotification('Install cancelled.', 'info');
-            }
-        } catch (error) {
-            console.error('PWA install error:', error);
-            this.showNotification('Installation failed. Please try again.', 'error');
+        
+        // Check if already installed
+        const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
+                          (window.navigator.standalone === true) ||
+                          document.referrer.includes('android-app://');
+        
+        if (isInstalled) {
+            console.log('App appears to be already installed');
+            this.showNotification('App appears to be already installed. Check your home screen or app drawer.', 'info');
+            return;
         }
         
-        this.deferredPrompt = null;
+        // For browsers that support beforeinstallprompt, the prompt should appear automatically
+        // For others, provide instructions
+        if ('standalone' in window.navigator && window.navigator.standalone === false) {
+            // iOS Safari
+            this.showNotification('On iOS Safari: tap Share → Add to Home Screen', 'info');
+            return;
+        }
+        
+        // If we have deferred prompt (from beforeinstallprompt), use it
+        if (this.deferredPrompt) {
+            try {
+                this.deferredPrompt.prompt();
+                const { outcome } = await this.deferredPrompt.userChoice;
+                console.log('Install outcome:', outcome);
+                
+                if (outcome === 'accepted') {
+                    console.log('PWA installed successfully');
+                    this.showNotification('App installed successfully!', 'success');
+                } else {
+                    console.log('PWA install dismissed');
+                    this.showNotification('Install cancelled.', 'info');
+                }
+            } catch (error) {
+                console.error('PWA install error:', error);
+                this.showNotification('Installation failed. Please try again.', 'error');
+            }
+            
+            this.deferredPrompt = null;
+        } else {
+            // No deferred prompt, browser should show its own prompt
+            this.showNotification('Installation prompt should appear from your browser. If not, try refreshing the page or using Chrome/Edge.', 'info');
+        }
         
         // Hide install buttons
         document.getElementById('installPWABtn').style.display = 'none';
