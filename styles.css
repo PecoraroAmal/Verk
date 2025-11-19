@@ -637,22 +637,22 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 
 .btn-text:hover { color: var(--text-primary); }
 
-.popular-modal .modal-content { max-width: 900px; }
+.popular-modal .modal-content { max-width: 450px; }
 
 .popular-tabs {
     display: flex;
-    gap: 0.5rem;
-    padding: 1.5rem 1.5rem 0;
+    gap: 0.25rem;
+    padding: 0.75rem 0.75rem 0;
     overflow-x: auto;
     border-bottom: 1px solid var(--border-colour);
 }
 
 .tab-btn {
-    padding: 0.75rem 1.25rem;
+    padding: 0.375rem 0.625rem;
     border: none;
     background: none;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.45rem;
     font-weight: 500;
     cursor: pointer;
     border-bottom: 2px solid transparent;
@@ -663,7 +663,7 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 .tab-btn.active { color: var(--primary-colour); border-bottom-color: var(--primary-colour); }
 
 .popular-list {
-    padding: 1.5rem;
+    padding: 0.75rem;
     max-height: 60vh;
     overflow-y: auto;
 }
@@ -674,18 +674,24 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 1rem;
+    padding: 0.375rem 0.5rem;
     background-color: var(--surface);
-    border-radius: 12px;
-    margin-bottom: 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.375rem;
     border: 1px solid var(--border-colour);
     cursor: pointer;
+    min-height: 44px;
 }
 
 .saga-toggle { color: var(--text-secondary); transition: transform 0.15s ease; }
 .saga-group.collapsed .saga-toggle { transform: rotate(-90deg); }
 
-.saga-title { font-weight: 600; font-size: 1.05rem; color: var(--text-primary); }
+.saga-title {
+    font-weight: 600;
+    font-size: 0.525rem;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+}
 
 .add-saga-btn, .add-popular-btn {
     padding: 0.5rem 1rem;
@@ -716,11 +722,12 @@ textarea.form-control { resize: vertical; min-height: 80px; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 0.5rem;
     border: 1px solid var(--border-colour);
-    border-radius: 12px;
-    margin-bottom: 0.75rem;
-    gap: 1rem;
+    border-radius: 6px;
+    margin-bottom: 0.375rem;
+    transition: all 0.15s ease;
+    gap: 0.5rem;
 }
 
 .popular-item:hover {

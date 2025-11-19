@@ -31,7 +31,7 @@ const popularFilms = [
         category: "films",
         rating: 7.6,
         status: "watched",
-        note: "Wizarding World saga",
+        note: "Harry Potter",
         colour: "#722F37"
     },
     {
@@ -39,7 +39,7 @@ const popularFilms = [
         category: "films",
         rating: 7.4,
         status: "watched",
-        note: "Wizarding World saga",
+        note: "Harry Potter",
         colour: "#722F37"
     },
     {
@@ -47,7 +47,7 @@ const popularFilms = [
         category: "films",
         rating: 7.9,
         status: "watched",
-        note: "Wizarding World saga",
+        note: "Harry Potter",
         colour: "#722F37"
     },
     {
@@ -55,7 +55,7 @@ const popularFilms = [
         category: "films",
         rating: 7.7,
         status: "watched",
-        note: "Wizarding World saga",
+        note: "Harry Potter",
         colour: "#722F37"
     },
     {
@@ -63,7 +63,7 @@ const popularFilms = [
         category: "films",
         rating: 7.5,
         status: "watched",
-        note: "Wizarding World saga",
+        note: "Harry Potter",
         colour: "#722F37"
     },
     {
@@ -71,7 +71,7 @@ const popularFilms = [
         category: "films",
         rating: 7.6,
         status: "watched",
-        note: "Wizarding World saga",
+        note: "Harry Potter",
         colour: "#722F37"
     },
     {
@@ -79,7 +79,7 @@ const popularFilms = [
         category: "films",
         rating: 7.7,
         status: "watched",
-        note: "Wizarding World saga",
+        note: "Harry Potter",
         colour: "#722F37"
     },
     {
@@ -87,7 +87,7 @@ const popularFilms = [
         category: "films",
         rating: 8.1,
         status: "watched",
-        note: "Wizarding World saga",
+        note: "Harry Potter",
         colour: "#722F37"
     },
     // Star Wars Original Trilogy
