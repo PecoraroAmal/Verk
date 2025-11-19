@@ -21,10 +21,14 @@ class VerkApp {
         const isHttpContext = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
         if ('serviceWorker' in navigator && isHttpContext) {
             navigator.serviceWorker.register('service-worker.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(err => console.log('Service Worker registration failed:', err));
+                .then(reg => {
+                    console.log('Service Worker registered successfully:', reg);
+                })
+                .catch(err => {
+                    console.error('Service Worker registration failed:', err);
+                });
         } else {
-            console.log('Service Worker not available in this context');
+            console.log('Service Worker not available in this context (protocol:', location.protocol, 'hostname:', location.hostname, ')');
         }
     }
     // Data Management
@@ -238,6 +242,7 @@ class VerkApp {
 
         // PWA install
         window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('beforeinstallprompt event fired');
             e.preventDefault();
             this.deferredPrompt = e;
             document.getElementById('installPWABtn').style.display = 'flex';
@@ -555,19 +560,42 @@ class VerkApp {
 
     // PWA Install
     async installPWA() {
+        console.log('Attempting PWA install...');
+        
+        // Check if we're in a valid installation context
+        const isHttpContext = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        if (!isHttpContext) {
+            console.log('Cannot install PWA from file:// protocol');
+            this.showNotification('PWA installation requires running over HTTP/HTTPS. Use a local server.', 'error');
+            return;
+        }
+        
         if (!this.deferredPrompt) {
+            console.log('No deferred prompt available');
             this.showNotification('Installation not available. Try using Chrome or Edge browser.', 'error');
             return;
         }
 
-        this.deferredPrompt.prompt();
-        const { outcome } = await this.deferredPrompt.userChoice;
-        
-        if (outcome === 'accepted') {
-            console.log('PWA installed');
+        try {
+            this.deferredPrompt.prompt();
+            const { outcome } = await this.deferredPrompt.userChoice;
+            console.log('Install outcome:', outcome);
+            
+            if (outcome === 'accepted') {
+                console.log('PWA installed successfully');
+                this.showNotification('App installed successfully!', 'success');
+            } else {
+                console.log('PWA install dismissed');
+                this.showNotification('Install cancelled.', 'info');
+            }
+        } catch (error) {
+            console.error('PWA install error:', error);
+            this.showNotification('Installation failed. Please try again.', 'error');
         }
         
         this.deferredPrompt = null;
+        
+        // Hide install buttons
         document.getElementById('installPWABtn').style.display = 'none';
         document.getElementById('installBtn').style.display = 'none';
         document.getElementById('installMessage').style.display = 'block';
