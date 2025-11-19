@@ -460,46 +460,28 @@ class VerkApp {
 
     // Data Import/Export
     downloadBlob(filename, dataStr) {
-        try {
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            // Legacy Edge/IE fallback
-            if (window.navigator && typeof window.navigator.msSaveOrOpenBlob === 'function') {
-                window.navigator.msSaveOrOpenBlob(blob, filename);
-                return true;
-            }
-
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-
-            const supportsDownload = 'download' in HTMLAnchorElement.prototype;
-            const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent);
-
-            if (!supportsDownload || isIOS) {
-                // Open in a new tab so the user can Save/Share
-                window.open(url, '_blank', 'noopener');
-                setTimeout(() => URL.revokeObjectURL(url), 1000);
-                return true;
-            }
-
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-            return true;
-        } catch (e) {
-            console.warn('downloadBlob failed, falling back to clipboard:', e);
-            // Last-resort: copy to clipboard
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(dataStr)
-                    .then(() => this.showNotification('Data copied to clipboard', 'success'))
-                    .catch(() => this.showNotification('Download failed and clipboard copy unavailable', 'error'));
-                return false;
-            }
-            this.showNotification('Download failed', 'error');
-            return false;
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        
+        // Legacy Edge/IE fallback
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, filename);
+            return;
         }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.style.display = 'none';
+        link.href = url;
+        link.download = filename;
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }, 100);
     }
 
     exportData() {
