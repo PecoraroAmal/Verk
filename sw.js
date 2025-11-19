@@ -28,6 +28,8 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+  // Activate new SW as soon as it's finished installing
+  self.skipWaiting();
 });
 
 // Fetch event
@@ -54,4 +56,14 @@ self.addEventListener('activate', event => {
       );
     })
   );
+  // Take control of uncontrolled clients as soon as possible
+  self.clients.claim();
+});
+
+// Handle messages from the page (e.g. skipWaiting)
+self.addEventListener('message', (event) => {
+  if (!event.data) return;
+  if (event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

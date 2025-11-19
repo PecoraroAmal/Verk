@@ -20,9 +20,36 @@ class VerkApp {
     registerServiceWorker() {
         const isHttpContext = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
         if ('serviceWorker' in navigator && isHttpContext) {
-            navigator.serviceWorker.register('sw.js')
+            navigator.serviceWorker.register('./sw.js')
                 .then(reg => {
                     console.log('Service Worker registered successfully:', reg);
+
+                    // Listen for updates to the service worker
+                    if (reg.waiting) {
+                        console.log('Service worker waiting — new version available');
+                    }
+
+                    reg.addEventListener('updatefound', () => {
+                        const newWorker = reg.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed') {
+                                    if (navigator.serviceWorker.controller) {
+                                        console.log('New service worker installed and waiting');
+                                    } else {
+                                        console.log('Service worker installed for the first time');
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+                    // Reload the page when the new SW takes control
+                    navigator.serviceWorker.addEventListener('controllerchange', () => {
+                        console.log('Service worker controller changed — reloading');
+                        // Optional: you can show a message and then reload
+                        window.location.reload();
+                    });
                 })
                 .catch(err => {
                     console.error('Service Worker registration failed:', err);
@@ -259,6 +286,19 @@ class VerkApp {
 
         document.getElementById('installPWABtn').addEventListener('click', () => this.installPWA());
         document.getElementById('installBtn').addEventListener('click', () => this.installPWA());
+
+        // Fired when the app is installed (user accepted the prompt)
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA was installed', evt);
+            this.deferredPrompt = null;
+            const pwaBtn = document.getElementById('installPWABtn');
+            const installBtn = document.getElementById('installBtn');
+            const installMsg = document.getElementById('installMessage');
+            if (pwaBtn) pwaBtn.style.display = 'none';
+            if (installBtn) installBtn.style.display = 'none';
+            if (installMsg) installMsg.style.display = 'block';
+            this.showNotification('App installed successfully!', 'success');
+        });
 
         // Mobile install prompt
         document.getElementById('closeMobilePrompt').addEventListener('click', () => this.closeMobilePrompt());
