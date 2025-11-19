@@ -165,6 +165,40 @@ class VerkApp {
         document.getElementById('importFile').addEventListener('change', (e) => this.importData(e));
         document.getElementById('downloadSampleBtn').addEventListener('click', () => this.downloadSample());
         document.getElementById('clearCacheBtn').addEventListener('click', () => this.clearCache());
+        const clearAllBtn = document.getElementById('clearAllDataBtn');
+        if (clearAllBtn) clearAllBtn.addEventListener('click', () => this.clearAllData());
+
+        // Optional: unified download button that prefers PWA install
+        const unifiedDownloadBtn = document.getElementById('download-btn');
+        if (unifiedDownloadBtn) {
+            unifiedDownloadBtn.addEventListener('click', async (ev) => {
+                if (this.deferredPrompt) {
+                    ev.preventDefault();
+                    try {
+                        this.deferredPrompt.prompt();
+                        const choice = await this.deferredPrompt.userChoice;
+                        if (choice.outcome === 'accepted') {
+                            await this.messageDialog('App installed successfully.', { title: 'Installed', okText: 'OK' });
+                        } else {
+                            await this.messageDialog('Install dismissed.', { title: 'Install', okText: 'OK' });
+                        }
+                    } catch (err) {
+                        await this.messageDialog('Unable to start installation.', { title: 'Install Error', okText: 'OK' });
+                    } finally {
+                        this.deferredPrompt = null;
+                        const btn = document.getElementById('installPWABtn');
+                        if (btn) btn.style.display = 'none';
+                        const btn2 = document.getElementById('installBtn');
+                        if (btn2) btn2.style.display = 'none';
+                        const msg = document.getElementById('installMessage');
+                        if (msg) msg.style.display = 'block';
+                    }
+                } else {
+                    // Fallback to JSON download
+                    this.downloadJSON();
+                }
+            });
+        }
 
         // Detail modal
         document.getElementById('closeDetailBtn').addEventListener('click', () => this.closeDetailModal());
@@ -425,15 +459,32 @@ class VerkApp {
     }
 
     // Data Import/Export
+    downloadBlob(filename, dataStr) {
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+
+        const supportsDownload = 'download' in HTMLAnchorElement.prototype;
+        const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent);
+
+        if (!supportsDownload || isIOS) {
+            window.open(url, '_blank', 'noopener');
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            return;
+        }
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
     exportData() {
         const dataStr = JSON.stringify(this.items, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `verk-backup-${new Date().toISOString().split('T')[0]}.json`;
-        link.click();
-        URL.revokeObjectURL(url);
+        const filename = `verk-backup-${new Date().toISOString().split('T')[0]}.json`;
+        this.downloadBlob(filename, dataStr);
     }
 
     importData(e) {
@@ -463,14 +514,12 @@ class VerkApp {
 
     downloadSample() {
         const dataStr = JSON.stringify(sampleData, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'verk-sample-data.json';
-        link.click();
-        URL.revokeObjectURL(url);
+        this.downloadBlob('verk-sample-data.json', dataStr);
         this.showNotification('Sample data downloaded!', 'success');
+    }
+
+    downloadJSON() {
+        this.exportData();
     }
 
     async clearCache() {
@@ -559,6 +608,35 @@ class VerkApp {
             okBtn.addEventListener('click', onOk, { once: true });
             cancelBtn.addEventListener('click', onCancel, { once: true });
             closeBtn.addEventListener('click', onCancel, { once: true });
+        });
+    }
+
+    // Message dialog (non-blocking)
+    messageDialog(message, options = {}) {
+        const title = options.title || 'Message';
+        const okText = options.okText || 'OK';
+
+        const modal = document.getElementById('messageModal');
+        const titleEl = document.getElementById('messageTitle');
+        const msgEl = document.getElementById('messageText');
+        const okBtn = document.getElementById('messageOkBtn');
+        const closeBtn = document.getElementById('closeMessageBtn');
+
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+        okBtn.textContent = okText;
+
+        modal.style.display = 'flex';
+
+        return new Promise((resolve) => {
+            const cleanup = () => {
+                okBtn.removeEventListener('click', onOk);
+                closeBtn.removeEventListener('click', onOk);
+                modal.style.display = 'none';
+            };
+            const onOk = () => { cleanup(); resolve(true); };
+            okBtn.addEventListener('click', onOk, { once: true });
+            closeBtn.addEventListener('click', onOk, { once: true });
         });
     }
 
@@ -737,6 +815,30 @@ class VerkApp {
         this.renderItems();
         this.closeDetailModal();
         this.showNotification('Item deleted successfully', 'success');
+    }
+
+    // Clear All Data (localStorage)
+    async clearAllData() {
+        const ok = await this.confirmDialog('This will delete ALL your data. This cannot be undone. Continue?', {
+            title: 'Clear All Data',
+            confirmHtml: '<i class="fas fa-trash"></i> Delete',
+            confirmText: 'Delete',
+            cancelText: 'Cancel'
+        });
+        if (!ok) return;
+
+        try {
+            localStorage.removeItem('verkItems');
+            localStorage.removeItem('verkTheme');
+            localStorage.removeItem('verkMobilePromptDismissed');
+        } catch (e) {
+            console.warn('localStorage clear error:', e);
+        }
+
+        this.items = [];
+        this.renderItems();
+        await this.messageDialog('All data has been cleared', { title: 'Cleared', okText: 'OK' });
+        location.reload();
     }
 
     // Mobile Install Prompt

@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <script>
-        if (window.location.pathname + window.location.search !== '/Verk/index.html?v=2.1') {
-            window.location.replace('/Verk/index.html?v=2.1');
+        if (window.location.pathname + window.location.search !== '/Verk/index.html?v=2.2') {
+            window.location.replace('/Verk/index.html?v=2.2');
         }
     </script>
 </head>
@@ -165,6 +165,12 @@
                             <i class="fas fa-trash"></i> Clear Cache
                         </button>
                     </div>
+                    <div class="setting-item">
+                        <label>Clear All Data</label>
+                        <button id="clearAllDataBtn" class="btn-danger">
+                            <i class="fas fa-exclamation-triangle"></i> Delete Everything
+                        </button>
+                    </div>
                 </div>
 
                 <div class="settings-section">
@@ -198,7 +204,7 @@
                     </div>
                     <div class="setting-item">
                         <a href="https://github.com/PecoraroAmal/Verk" target="_blank" rel="noopener" class="btn-secondary">
-                            <i class="fab fa-github"></i> View on GitHub Verk™ 2.1
+                            <i class="fab fa-github"></i> View on GitHub Verk™ 2.2
                         </a>
                     </div>
                 </div>
@@ -441,6 +447,24 @@
                 <div class="modal-actions">
                     <button id="confirmCancelBtn" class="btn-secondary">Cancel</button>
                     <button id="confirmOkBtn" class="btn-danger"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Modal -->
+        <div id="messageModal" class="modal" style="display: none;">
+            <div class="modal-content modal-small">
+                <div class="modal-header">
+                    <h2 id="messageTitle">Message</h2>
+                    <button id="closeMessageBtn" class="btn-icon">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="messageText"></p>
+                </div>
+                <div class="modal-actions">
+                    <button id="messageOkBtn" class="btn-primary">OK</button>
                 </div>
             </div>
         </div>
