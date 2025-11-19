@@ -13,7 +13,7 @@ class VerkApp {
         this.applyTheme();
         this.renderItems();
         this.registerServiceWorker();
-        this.checkMobilePrompt();
+        // this.checkMobilePrompt(); // removed
     }
 
     // Service Worker Registration
@@ -267,39 +267,40 @@ class VerkApp {
             }
         });
 
-        // PWA install
-        window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('beforeinstallprompt event fired');
-            // Do not prevent default to allow browser's native install prompt
-            // e.preventDefault();
-            // this.deferredPrompt = e;
-            // document.getElementById('installPWABtn').style.display = 'flex';
-            // document.getElementById('installBtn').style.display = 'inline-flex';
-            // document.getElementById('installMessage').style.display = 'none';
-            
-            // If mobile prompt is showing, update it
-            const mobilePrompt = document.getElementById('mobileInstallPrompt');
-            if (mobilePrompt && mobilePrompt.style.display === 'block') {
-                document.querySelector('.install-instructions').style.display = 'none';
-                document.getElementById('installMobileBtn').style.display = 'inline-flex';
-            }
-        });
+        // PWA install - removed to avoid download prompts
+        // window.addEventListener('beforeinstallprompt', (e) => {
+        //     console.log('beforeinstallprompt event fired');
+        //     // Do not prevent default to allow browser's native install prompt
+        //     // e.preventDefault();
+        //     // this.deferredPrompt = e;
+        //     // document.getElementById('installPWABtn').style.display = 'flex';
+        //     // document.getElementById('installBtn').style.display = 'inline-flex';
+        //     // document.getElementById('installMessage').style.display = 'none';
+        //     
+        //     // If mobile prompt is showing, update it
+        //     const mobilePrompt = document.getElementById('mobileInstallPrompt');
+        //     if (mobilePrompt && mobilePrompt.style.display === 'block') {
+        //         document.querySelector('.install-instructions').style.display = 'none';
+        //         document.getElementById('installMobileBtn').style.display = 'inline-flex';
+        //     }
+        // });
 
-        document.getElementById('installPWABtn').addEventListener('click', () => this.installPWA());
-        document.getElementById('installBtn').addEventListener('click', () => this.installPWA());
+        // PWA install buttons - removed
+        // document.getElementById('installPWABtn').addEventListener('click', () => this.installPWA());
+        // document.getElementById('installBtn').addEventListener('click', () => this.installPWA());
 
-        // Fired when the app is installed (user accepted the prompt)
-        window.addEventListener('appinstalled', (evt) => {
-            console.log('PWA was installed', evt);
-            // No deferredPrompt to clear since we don't prevent the prompt
-            const pwaBtn = document.getElementById('installPWABtn');
-            const installBtn = document.getElementById('installBtn');
-            const installMsg = document.getElementById('installMessage');
-            if (pwaBtn) pwaBtn.style.display = 'none';
-            if (installBtn) installBtn.style.display = 'none';
-            if (installMsg) installMsg.style.display = 'block';
-            this.showNotification('App installed successfully!', 'success');
-        });
+        // PWA installed - removed
+        // window.addEventListener('appinstalled', (evt) => {
+        //     console.log('PWA was installed', evt);
+        //     // No deferredPrompt to clear since we don't prevent the prompt
+        //     const pwaBtn = document.getElementById('installPWABtn');
+        //     const installBtn = document.getElementById('installBtn');
+        //     const installMsg = document.getElementById('installMessage');
+        //     if (pwaBtn) pwaBtn.style.display = 'none';
+        //     if (installBtn) installBtn.style.display = 'none';
+        //     if (installMsg) installMsg.style.display = 'block';
+        //     this.showNotification('App installed successfully!', 'success');
+        // });
 
         // Mobile install prompt
         document.getElementById('closeMobilePrompt').addEventListener('click', () => this.closeMobilePrompt());
