@@ -460,25 +460,46 @@ class VerkApp {
 
     // Data Import/Export
     downloadBlob(filename, dataStr) {
-        const blob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
+        try {
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            // Legacy Edge/IE fallback
+            if (window.navigator && typeof window.navigator.msSaveOrOpenBlob === 'function') {
+                window.navigator.msSaveOrOpenBlob(blob, filename);
+                return true;
+            }
 
-        const supportsDownload = 'download' in HTMLAnchorElement.prototype;
-        const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
 
-        if (!supportsDownload || isIOS) {
-            window.open(url, '_blank', 'noopener');
+            const supportsDownload = 'download' in HTMLAnchorElement.prototype;
+            const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent);
+
+            if (!supportsDownload || isIOS) {
+                // Open in a new tab so the user can Save/Share
+                window.open(url, '_blank', 'noopener');
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                return true;
+            }
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
             setTimeout(() => URL.revokeObjectURL(url), 1000);
-            return;
+            return true;
+        } catch (e) {
+            console.warn('downloadBlob failed, falling back to clipboard:', e);
+            // Last-resort: copy to clipboard
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(dataStr)
+                    .then(() => this.showNotification('Data copied to clipboard', 'success'))
+                    .catch(() => this.showNotification('Download failed and clipboard copy unavailable', 'error'));
+                return false;
+            }
+            this.showNotification('Download failed', 'error');
+            return false;
         }
-
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
 
     exportData() {
@@ -828,9 +849,12 @@ class VerkApp {
         if (!ok) return;
 
         try {
-            localStorage.removeItem('verkItems');
-            localStorage.removeItem('verkTheme');
-            localStorage.removeItem('verkMobilePromptDismissed');
+            // Prefer clearing the entire origin storage for this app
+            try { localStorage.removeItem('verkItems'); } catch {}
+            try { localStorage.removeItem('verkTheme'); } catch {}
+            try { localStorage.removeItem('verkMobilePromptDismissed'); } catch {}
+            // As a stronger fallback, clear all localStorage for this origin
+            try { localStorage.clear(); } catch {}
         } catch (e) {
             console.warn('localStorage clear error:', e);
         }
