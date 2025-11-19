@@ -589,6 +589,17 @@ class VerkApp {
         if (!this.deferredPrompt) {
             console.log('No deferred prompt available - checking alternatives...');
             
+            // Check if already installed
+            const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
+                              (window.navigator.standalone === true) ||
+                              document.referrer.includes('android-app://');
+            
+            if (isInstalled) {
+                console.log('App appears to be already installed');
+                this.showNotification('App appears to be already installed. Check your home screen or app drawer.', 'info');
+                return;
+            }
+            
             // Try alternative installation methods
             if ('standalone' in window.navigator && window.navigator.standalone === false) {
                 // iOS Safari
@@ -596,7 +607,12 @@ class VerkApp {
                 return;
             }
             
-            this.showNotification('Installation not available. Make sure you\'re using Chrome/Edge and the app isn\'t already installed.', 'error');
+            // Browser-specific messages
+            if (isBrave) {
+                this.showNotification('PWA installation in Brave requires enabling the flag. Check the previous message.', 'error');
+            } else {
+                this.showNotification('Installation not available. Make sure you\'re using Chrome/Edge and the app isn\'t already installed.', 'error');
+            }
             return;
         }
 
