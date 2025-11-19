@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <script>
-        if (window.location.pathname + window.location.search !== '/Verk/index.html?v=2.28') {
-            window.location.replace('/Verk/index.html?v=2.28');
+        if (window.location.pathname + window.location.search !== '/Verk/index.html?v=3.00') {
+            window.location.replace('/Verk/index.html?v=3.00');
         }
     </script>
 </head>
@@ -56,29 +56,15 @@
         <main id="mainContent">
             <!-- Filter Section -->
             <div class="filters">
-                <div class="category-filter-icons">
-                    <button class="category-icon-btn active" data-category="all" title="All Categories">
-                        <i class="fas fa-border-all"></i>
-                    </button>
-                    <button class="category-icon-btn" data-category="films" title="Films">
-                        <i class="fas fa-film"></i>
-                    </button>
-                    <button class="category-icon-btn" data-category="tv-series" title="TV Series">
-                        <i class="fas fa-tv"></i>
-                    </button>
-                    <button class="category-icon-btn" data-category="anime" title="Anime">
-                        <i class="fas fa-dragon"></i>
-                    </button>
-                    <button class="category-icon-btn" data-category="cartoons" title="Cartoons">
-                        <i class="fa-brands fa-bilibili"></i>
-                    </button>
-                    <button class="category-icon-btn" data-category="books" title="Books">
-                        <i class="fas fa-book"></i>
-                    </button>
-                    <button class="category-icon-btn" data-category="manga" title="Manga">
-                        <i class="fas fa-book-open"></i>
-                    </button>
-                </div>
+                <select id="categoryFilter" class="filter-select">
+                    <option value="all">All Categories</option>
+                    <option value="films">Films</option>
+                    <option value="tv-series">TV Series</option>
+                    <option value="anime">Anime</option>
+                    <option value="cartoons">Cartoons</option>
+                    <option value="books">Books</option>
+                    <option value="manga">Manga</option>
+                </select>
                 <select id="statusFilter" class="filter-select">
                     <option value="all">All Statuses</option>
                     <option value="watched">Watched</option>
@@ -204,7 +190,7 @@
                     </div>
                     <div class="setting-item">
                         <a href="https://github.com/PecoraroAmal/Verk" target="_blank" rel="noopener" class="btn-secondary">
-                            <i class="fab fa-github"></i> View on GitHub Verk™ 2.28
+                            <i class="fab fa-github"></i> View on GitHub Verk™ 3.00
                         </a>
                     </div>
                 </div>

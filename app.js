@@ -237,13 +237,7 @@ class VerkApp {
         document.getElementById('deleteItemBtn').addEventListener('click', () => this.deleteCurrentItem());
 
         // Filters
-        document.querySelectorAll('.category-icon-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.category-icon-btn').forEach(b => b.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-                this.filterItems();
-            });
-        });
+        document.getElementById('categoryFilter').addEventListener('change', () => this.filterItems());
         document.getElementById('statusFilter').addEventListener('change', () => this.filterItems());
         document.getElementById('searchInput').addEventListener('input', () => this.filterItems());
         document.getElementById('favoritesFilterBtn').addEventListener('click', () => this.toggleFavoritesFilter());
@@ -436,8 +430,7 @@ class VerkApp {
         form.reset();
         
         // Set default category based on current filter
-        const activeCategoryBtn = document.querySelector('.category-icon-btn.active');
-        let category = activeCategoryBtn ? activeCategoryBtn.dataset.category : 'films';
+        let category = document.getElementById('categoryFilter').value;
         if (category === 'all') category = 'films';
         
         document.getElementById('quickItemCategory').value = category;
@@ -778,8 +771,7 @@ class VerkApp {
     }
 
     filterItems() {
-        const activeCategoryBtn = document.querySelector('.category-icon-btn.active');
-        const categoryFilter = activeCategoryBtn ? activeCategoryBtn.dataset.category : 'all';
+        const categoryFilter = document.getElementById('categoryFilter').value;
         const statusFilter = document.getElementById('statusFilter').value;
         const searchQuery = document.getElementById('searchInput').value.toLowerCase();
         const favoritesOnly = document.getElementById('favoritesFilterBtn').classList.contains('active');
