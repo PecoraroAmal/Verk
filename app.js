@@ -460,28 +460,22 @@ class VerkApp {
 
     // Data Import/Export
     downloadBlob(filename, dataStr) {
-        const blob = new Blob([dataStr], { type: 'application/json' });
+        // Use data URL for maximum compatibility
+        const dataUrl = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
         
-        // Legacy Edge/IE fallback
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(blob, filename);
-            return;
-        }
-
-        const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.style.display = 'none';
-        link.href = url;
+        link.href = dataUrl;
         link.download = filename;
         
+        // Ensure the link is in the DOM
         document.body.appendChild(link);
+        
+        // Trigger download
         link.click();
         
         // Clean up
-        setTimeout(() => {
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }, 100);
+        document.body.removeChild(link);
     }
 
     exportData() {
