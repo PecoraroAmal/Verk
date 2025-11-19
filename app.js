@@ -358,11 +358,13 @@ class VerkApp {
         }
 
         modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
     }
 
     closeModal() {
         document.getElementById('itemModal').style.display = 'none';
         this.currentEditId = null;
+        document.body.classList.remove('modal-open');
     }
 
     updateFormFields(category) {
@@ -439,6 +441,7 @@ class VerkApp {
         
         document.getElementById('quickItemCategory').value = category;
         modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
         
         // Focus on name input
         setTimeout(() => document.getElementById('quickItemName').focus(), 100);
@@ -446,6 +449,7 @@ class VerkApp {
 
     closeQuickAddModal() {
         document.getElementById('quickAddModal').style.display = 'none';
+        document.body.classList.remove('modal-open');
     }
 
     handleQuickAddSubmit(e) {
@@ -696,12 +700,14 @@ class VerkApp {
         cancelBtn.textContent = cancelText;
 
         modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
 
         return new Promise((resolve) => {
             const cleanup = () => {
                 okBtn.removeEventListener('click', onOk);
                 cancelBtn.removeEventListener('click', onCancel);
                 closeBtn.removeEventListener('click', onCancel);
+                document.body.classList.remove('modal-open');
                 modal.style.display = 'none';
             };
             const onOk = () => { cleanup(); resolve(true); };
@@ -728,11 +734,13 @@ class VerkApp {
         okBtn.textContent = okText;
 
         modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
 
         return new Promise((resolve) => {
             const cleanup = () => {
                 okBtn.removeEventListener('click', onOk);
                 closeBtn.removeEventListener('click', onOk);
+                document.body.classList.remove('modal-open');
                 modal.style.display = 'none';
             };
             const onOk = () => { cleanup(); resolve(true); };
@@ -893,10 +901,12 @@ class VerkApp {
         
         document.getElementById('detailModal').dataset.itemId = item.id;
         document.getElementById('detailModal').style.display = 'flex';
+        document.body.classList.add('modal-open');
     }
 
     closeDetailModal() {
         document.getElementById('detailModal').style.display = 'none';
+        document.body.classList.remove('modal-open');
     }
 
     async deleteCurrentItem() {
@@ -964,6 +974,7 @@ class VerkApp {
                         document.getElementById('installMobileBtn').style.display = 'none';
                     }
                     prompt.style.display = 'block';
+                    document.body.classList.add('modal-open');
                 }
             }, 3000);
         }
@@ -971,6 +982,7 @@ class VerkApp {
 
     closeMobilePrompt() {
         document.getElementById('mobileInstallPrompt').style.display = 'none';
+        document.body.classList.remove('modal-open');
     }
 
     dismissMobilePrompt() {
@@ -988,12 +1000,14 @@ class VerkApp {
     // Popular Items Browser
     openPopularBrowser() {
         document.getElementById('popularBrowser').style.display = 'flex';
+        document.body.classList.add('modal-open');
         document.getElementById('popularSearch').value = '';
         this.switchPopularTab('films');
     }
 
     closePopularBrowser() {
         document.getElementById('popularBrowser').style.display = 'none';
+        document.body.classList.remove('modal-open');
     }
 
     switchPopularTab(category) {
