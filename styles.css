@@ -5,18 +5,53 @@
     box-sizing: border-box;
 }
 
+/* CSS Variables for Themes */
+:root {
+    --bg-color: white;
+    --text-color: black;
+    --header-bg: black;
+    --header-text: white;
+    --btn-bg: black;
+    --btn-text: white;
+    --btn-hover-bg: #333;
+    --border-color: black;
+    --card-bg: #f0f0f0;
+    --card-border: black;
+    --input-bg: white;
+    --input-text: black;
+    --settings-bg: white;
+    --settings-text: black;
+}
+
+[data-theme="dark"] {
+    --bg-color: black;
+    --text-color: white;
+    --header-bg: white;
+    --header-text: black;
+    --btn-bg: white;
+    --btn-text: black;
+    --btn-hover-bg: #ccc;
+    --border-color: white;
+    --card-bg: #333;
+    --card-border: white;
+    --input-bg: #333;
+    --input-text: white;
+    --settings-bg: #222;
+    --settings-text: white;
+}
+
 /* Body */
 body {
     font-family: Arial, sans-serif;
-    background-color: white;
-    color: black;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     line-height: 1.6;
 }
 
 /* Header */
 header {
-    background-color: black;
-    color: white;
+    background-color: var(--header-bg);
+    color: var(--header-text);
     padding: 1rem;
 }
 
@@ -35,16 +70,16 @@ header {
 
 /* Buttons */
 .btn-primary, .btn-secondary, .btn-icon, .btn-install {
-    background-color: black;
-    color: white;
-    border: none;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
+    border: 1px solid var(--border-color);
     padding: 0.5rem 1rem;
     cursor: pointer;
     border-radius: 4px;
 }
 
 .btn-primary:hover, .btn-secondary:hover, .btn-icon:hover, .btn-install:hover {
-    background-color: #333;
+    background-color: var(--btn-hover-bg);
 }
 
 .btn-icon {
@@ -73,24 +108,24 @@ main {
 }
 
 .category-icon-btn {
-    background-color: white;
-    color: black;
-    border: 1px solid black;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     padding: 0.5rem;
     cursor: pointer;
     border-radius: 4px;
 }
 
 .category-icon-btn.active {
-    background-color: black;
-    color: white;
+    background-color: var(--btn-bg);
+    color: var(--btn-text);
 }
 
 .filter-select, .search-input {
     padding: 0.5rem;
-    border: 1px solid black;
-    background-color: white;
-    color: black;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--input-text);
 }
 
 /* Items Grid */
@@ -102,9 +137,9 @@ main {
 
 /* Item Card */
 .item-card {
-    background-color: var(--card-colour, #f0f0f0);
-    border: 1px solid black;
-    border-left: 5px solid var(--card-colour, #f0f0f0);
+    background-color: var(--card-colour, var(--card-bg));
+    border: 1px solid var(--card-border);
+    border-left: 5px solid var(--card-colour, var(--card-bg));
     border-radius: 8px;
     padding: 1rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -139,8 +174,8 @@ main {
 }
 
 .settings-content {
-    background-color: white;
-    color: black;
+    background-color: var(--settings-bg);
+    color: var(--settings-text);
     padding: 2rem;
     border-radius: 8px;
     max-width: 500px;
