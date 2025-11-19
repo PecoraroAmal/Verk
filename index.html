@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Track all your films, TV series, anime, cartoons, books, and manga in one place">
+    <meta name="theme-color" content="#000000">
+    <title>Verk™</title>
+    <link rel="icon" type="image/png" href="icons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="icons/favicon.svg" />
+    <link rel="shortcut icon" href="icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Verk™" />
+    <link rel="manifest" href="icons/site.webmanifest" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        if (window.location.pathname + window.location.search !== '/Verk/index.html?v=2.0') {
+            window.location.replace('/Verk/index.html?v=2.0');
+        }
+    </script>
+</head>
+<body>
+    <div id="app">
+        <!-- Notification Message -->
+        <div id="notificationMessage" class="notification-message" style="display: none;"></div>
+
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <h1>Verk™</h1>
+                <div class="header-actions">
+                    <button id="installPWABtn" class="btn-install" title="Install App" style="display: none;">
+                        <i class="fas fa-download"></i>
+                    </button>
+                    <button id="browseHeaderBtn" class="btn-icon" title="Browse popular items">
+                        <i class="fas fa-compass"></i>
+                    </button>
+                    <button id="favoritesFilterBtn" class="btn-icon" title="Filter Favorites">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <button id="quickAddBtn" class="btn-icon" title="Quick add">
+                        <i class="fas fa-bolt"></i>
+                    </button>
+                    <button id="addItemBtn" class="btn-primary" title="Add new item">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button id="settingsBtn" class="btn-icon" title="Settings">
+                        <i class="fas fa-gear"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="mainContent">
+            <!-- Filter Section -->
+            <div class="filters">
+                <div class="category-filter-icons">
+                    <button class="category-icon-btn active" data-category="all" title="All Categories">
+                        <i class="fas fa-border-all"></i>
+                    </button>
+                    <button class="category-icon-btn" data-category="films" title="Films">
+                        <i class="fas fa-film"></i>
+                    </button>
+                    <button class="category-icon-btn" data-category="tv-series" title="TV Series">
+                        <i class="fas fa-tv"></i>
+                    </button>
+                    <button class="category-icon-btn" data-category="anime" title="Anime">
+                        <i class="fas fa-dragon"></i>
+                    </button>
+                    <button class="category-icon-btn" data-category="cartoons" title="Cartoons">
+                        <i class="fa-brands fa-bilibili"></i>
+                    </button>
+                    <button class="category-icon-btn" data-category="books" title="Books">
+                        <i class="fas fa-book"></i>
+                    </button>
+                    <button class="category-icon-btn" data-category="manga" title="Manga">
+                        <i class="fas fa-book-open"></i>
+                    </button>
+                </div>
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">All Statuses</option>
+                    <option value="watched">Watched</option>
+                    <option value="to-watch">To Watch</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="read">Read</option>
+                    <option value="to-read">To Read</option>
+                </select>
+                <input type="search" id="searchInput" class="search-input" placeholder="Search by name...">
+            </div>
+
+            <!-- Items Grid -->
+            <div id="itemsGrid" class="items-grid">
+                <!-- Cards will be dynamically inserted here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">📚</div>
+                <h2>No items yet</h2>
+                <p>Start tracking your media by adding your first item!</p>
+                <br>
+                <button class="btn-primary" onclick="document.getElementById('addItemBtn').click()">
+                    <i class="fas fa-plus"></i> Add Your First Item
+                </button>
+            </div>
+        </main>
+
+        <!-- Settings Page -->
+        <div id="settingsPage" class="settings-page" style="display: none;">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2>Settings</h2>
+                    <button id="closeSettingsBtn" class="btn-icon">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Appearance</h3>
+                    <div class="setting-item">
+                        <label>Theme</label>
+                        <div class="theme-toggle">
+                            <button class="theme-btn" data-theme="light" title="Light theme">
+                                <i class="fas fa-sun"></i>
+                                <span>Light</span>
+                            </button>
+                            <button class="theme-btn" data-theme="dark" title="Dark theme">
+                                <i class="fas fa-moon"></i>
+                                <span>Dark</span>
+                            </button>
+                            <button class="theme-btn" data-theme="auto" title="Auto (System)">
+                                <i class="fas fa-circle-half-stroke"></i>
+                                <span>Auto</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Data Management</h3>
+                    <div class="setting-item">
+                        <label>Export Data</label>
+                        <button id="exportBtn" class="btn-secondary">
+                            <i class="fas fa-download"></i> Download JSON
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <label>Import Data</label>
+                        <button id="importBtn" class="btn-secondary">
+                            <i class="fas fa-upload"></i> Upload JSON
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                    </div>
+                    <div class="setting-item">
+                        <label>Download Sample Data</label>
+                        <button id="downloadSampleBtn" class="btn-secondary">
+                            <i class="fas fa-file-download"></i> Download Sample
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <label>Clear Browser Cache</label>
+                        <button id="clearCacheBtn" class="btn-secondary">
+                            <i class="fas fa-trash"></i> Clear Cache
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Cookie & Privacy</h3>
+                    <div class="setting-item">
+                        <p class="about-text">
+                            <strong>Your Privacy Matters</strong><br>
+                            Verk™ does not use cookies, trackers, or analytics. All your data is stored locally on your device using browser localStorage.
+                        </p>
+                        <p class="about-text">
+                            We don't collect, store, or transmit any personal information to external servers. Your media tracking data remains completely private and under your control.
+                        </p>
+                        <p class="about-text">
+                            <strong>Data Storage:</strong> Local browser storage only<br>
+                            <strong>Cookies:</strong> None<br>
+                            <strong>Third-party services:</strong> None<br>
+                            <strong>Analytics:</strong> None
+                        </p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>About</h3>
+                    <div class="setting-item">
+                        <p class="about-text">
+                            <strong>Verk™</strong> means "works" in Swedish. This app helps you track all your films, TV series, anime, cartoons, books, and manga in one place.
+                        </p>
+                        <p class="about-text">
+                            All data is stored locally in your browser. You can export and import your data as JSON files.
+                        </p>
+                    </div>
+                    <div class="setting-item">
+                        <a href="https://github.com/PecoraroAmal/Verk" target="_blank" rel="noopener" class="btn-secondary">
+                            <i class="fab fa-github"></i> View on GitHub Verk™ 2.0
+                        </a>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Info</h3>
+                    <div class="setting-item">
+                        <p class="about-text"><strong>How it works</strong></p>
+                        <p class="about-text">
+                            - <strong>Add items</strong>: use <i class="fas fa-plus"></i> to open the form, <i class="fas fa-bolt"></i> for <em>Quick Add</em>, or <i class="fas fa-compass"></i> for the <strong>Popular Catalogue</strong> (category tabs, search, sagas with "Add All").
+                        </p>
+                        <p class="about-text">
+                            - <strong>Catalogue icons</strong>: <i class="fas fa-plus"></i> adds; <i class="fas fa-heart"></i> means the item is already in your library.
+                        </p>
+                        <p class="about-text">
+                            - <strong>Favourites</strong>: each card has a heart at bottom-right to mark as favourite. The toolbar <i class="far fa-heart"></i> filters to favourites only.
+                        </p>
+                        <p class="about-text">
+                            - <strong>Filters & search</strong>: filter by <em>category</em> (icons), <em>status</em> (watched/to watch/in progress/read/to read), and search by <em>name</em>.
+                        </p>
+                        <p class="about-text">
+                            - <strong>Details & edit</strong>: tap a card to view details, edit, or delete.
+                        </p>
+                        <p class="about-text">
+                            - <strong>Sagas</strong>: in the Catalogue, titles in the same saga are grouped. Expand/collapse and use "Add All" to add them in bulk (duplicates are skipped).
+                        </p>
+                        <p class="about-text">
+                            - <strong>Themes</strong>: choose Light/Dark/Auto in Settings.
+                        </p>
+                        <p class="about-text">
+                            - <strong>Data</strong>: export/import JSON, download sample data. Clearing the browser cache does not touch your items (stored locally).
+                        </p>
+                        <p class="about-text">
+                            - <strong>Install & offline</strong>: install the app as a PWA using the Install button. Works offline. Some features (service worker/clear cache) require opening the app over http/https (e.g., a local server) rather than file://.
+                        </p>
+                        <p class="about-text" style="color: var(--text-secondary);">
+                            <strong>Privacy</strong>: no tracking or cookies; all data stays on your device (see "Cookie & Privacy").
+                        </p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>Install App</h3>
+                    <div class="setting-item">
+                        <p class="about-text">Install Verk™ as a Progressive Web App for offline access and a native app experience.</p>
+                        <button id="installBtn" class="btn-primary" style="display: inline-flex;">
+                            <i class="fas fa-mobile-screen"></i> Install App
+                        </button>
+                        <p id="installMessage" class="about-text" style="display: none; color: var(--text-secondary);">
+                            App is already installed.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Item Modal (Create/Edit) -->
+        <div id="itemModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Add New Item</h2>
+                    <button id="closeModalBtn" class="btn-icon">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+
+                <form id="itemForm">
+                    <input type="hidden" id="itemId">
+
+                    <div class="form-group">
+                        <label for="itemCategory">Category *</label>
+                        <select id="itemCategory" required class="form-control">
+                            <option value="">Select a category</option>
+                            <option value="films">Films</option>
+                            <option value="tv-series">TV Series</option>
+                            <option value="anime">Anime</option>
+                            <option value="cartoons">Cartoons</option>
+                            <option value="books">Books</option>
+                            <option value="manga">Manga</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemName">Name *</label>
+                        <input type="text" id="itemName" required class="form-control" placeholder="Enter name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemRating">Rating (0-10)</label>
+                        <input type="number" id="itemRating" min="0" max="10" step="0.1" class="form-control" placeholder="0.0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemStatus">Status *</label>
+                        <select id="itemStatus" required class="form-control">
+                            <option value="">Select status</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemFirstDate" id="firstDateLabel">First Viewing</label>
+                        <input type="date" id="itemFirstDate" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemRepeats" id="repeatsLabel">Rewatches Done</label>
+                        <input type="number" id="itemRepeats" min="0" value="0" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemComment">Comment</label>
+                        <textarea id="itemComment" class="form-control" rows="3" placeholder="Your thoughts..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemNote">Note</label>
+                        <input type="text" id="itemNote" class="form-control" placeholder="e.g., Netflix, Amazon Prime">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemColour">Card Colour</label>
+                        <div class="colour-picker">
+                            <input type="color" id="itemColour" value="#4a90e2" class="colour-input">
+                            <input type="text" id="itemColourText" value="#4a90e2" class="form-control" pattern="^#[0-9A-Fa-f]{6}$">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="cancelBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <span id="submitBtnText">Add Item</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Add Modal -->
+        <div id="quickAddModal" class="modal" style="display: none;">
+            <div class="modal-content modal-small">
+                <div class="modal-header">
+                    <h2>Quick Add</h2>
+                    <button id="closeQuickAddBtn" class="btn-icon">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+
+                <form id="quickAddForm">
+                    <div class="form-group">
+                        <label for="quickItemName">Name *</label>
+                        <input type="text" id="quickItemName" required class="form-control" placeholder="Enter name" autofocus>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quickItemCategory">Category *</label>
+                        <select id="quickItemCategory" required class="form-control">
+                            <option value="films">Films</option>
+                            <option value="tv-series">TV Series</option>
+                            <option value="anime">Anime</option>
+                            <option value="cartoons">Cartoons</option>
+                            <option value="books">Books</option>
+                            <option value="manga">Manga</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" id="quickCancelBtn" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-bolt"></i> <span>Quick Add</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Item Detail Modal -->
+        <div id="detailModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="detailName">Item Name</h2>
+                    <button id="closeDetailBtn" class="btn-icon">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="detail-content">
+                    <div class="detail-row">
+                        <span class="detail-label">Category:</span>
+                        <span id="detailCategory" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Rating:</span>
+                        <span id="detailRating" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span id="detailStatus" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row" id="detailFirstDateRow">
+                        <span class="detail-label" id="detailFirstDateLabel">First Viewing:</span>
+                        <span id="detailFirstDate" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row" id="detailRepeatsRow">
+                        <span class="detail-label" id="detailRepeatsLabel">Rewatches Done:</span>
+                        <span id="detailRepeats" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row" id="detailCommentRow" style="display: none;">
+                        <span class="detail-label">Comment:</span>
+                        <span id="detailComment" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row" id="detailNoteRow" style="display: none;">
+                        <span class="detail-label">Note:</span>
+                        <span id="detailNote" class="detail-value"></span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="deleteItemBtn" class="btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    <button id="editItemBtn" class="btn-primary">
+                        <i class="fas fa-pen"></i> Edit
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirm Modal -->
+        <div id="confirmModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="confirmTitle">Confirm</h2>
+                    <button id="closeConfirmBtn" class="btn-icon">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage">Are you sure?</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="confirmCancelBtn" class="btn-secondary">Cancel</button>
+                    <button id="confirmOkBtn" class="btn-danger"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Install Prompt -->
+        <div id="mobileInstallPrompt" class="mobile-install-prompt" style="display: none;">
+            <div class="mobile-prompt-content">
+                <button id="closeMobilePrompt" class="close-prompt-btn">
+                    <i class="fas fa-xmark"></i>
+                </button>
+                <div class="prompt-icon">
+                    <i class="fas fa-mobile-screen-button"></i>
+                </div>
+                <h3>Install Verk™</h3>
+                <p>Add Verk™ to your home screen for quick access and offline use.</p>
+                <div class="prompt-actions">
+                    <button id="installMobileBtn" class="btn-primary btn-full">
+                        <i class="fas fa-download"></i> Install Now
+                    </button>
+                    <button id="dismissPrompt" class="btn-text">Maybe Later</button>
+                </div>
+                <div class="install-instructions" style="display: none;">
+                    <p class="instruction-text">
+                        <strong>To install:</strong><br>
+                        Tap the <i class="fas fa-share"></i> share button and select "Add to Home Screen"
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Items Browser -->
+        <div id="popularBrowser" class="modal" style="display: none;">
+            <div class="modal-content popular-modal">
+                <div class="modal-header">
+                    <h2>Browse Popular Items</h2>
+                    <button id="closePopularBtn" class="btn-icon">
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="popular-content">
+                    <div class="popular-tabs">
+                        <button class="tab-btn active" data-category="films">
+                            <i class="fas fa-film"></i> Films
+                        </button>
+                        <button class="tab-btn" data-category="tv-series">
+                            <i class="fas fa-tv"></i> TV Series
+                        </button>
+                        <button class="tab-btn" data-category="anime">
+                            <i class="fa-solid fa-dragon"></i> Anime
+                        </button>
+                        <button class="tab-btn" data-category="cartoons">
+                            <i class="fa-brands fa-bilibili"></i> Cartoons
+                        </button>
+                        <button class="tab-btn" data-category="books">
+                            <i class="fas fa-book"></i> Books
+                        </button>
+                        <button class="tab-btn" data-category="manga">
+                            <i class="fas fa-book-open"></i> Manga
+                        </button>
+                    </div>
+
+                    <div class="popular-search">
+                        <input type="search" id="popularSearch" class="search-input" placeholder="Search popular items...">
+                    </div>
+
+                    <div id="popularList" class="popular-list">
+                        <!-- Popular items will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data/films.js"></script>
+    <script src="data/tv-series.js"></script>
+    <script src="data/anime.js"></script>
+    <script src="data/cartoons.js"></script>
+    <script src="data/books.js"></script>
+    <script src="data/manga.js"></script>
+    <script src="data/sample.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
