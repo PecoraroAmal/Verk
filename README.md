@@ -1,6 +1,6 @@
-# Verk
+# Verk™ — Live: https://pecoraroamal.github.io/Verk/
 
-**Verk** (Swedish for "works") is a Progressive Web App (PWA) for tracking all your media and reading in one place.
+**Verk™** (Swedish for "works") is a Progressive Web App (PWA) for tracking all your media and reading in one place.
 
 ## Features
 
@@ -38,40 +38,6 @@
 - Works offline
 - Fast and reliable
 - Native app experience
-
-## Installation
-
-### Option 1: Run Locally
-
-1. Clone or download this repository
-2. Open a terminal in the project directory
-3. Start a local server:
-
-**Using Python:**
-```bash
-# Python 3
-python -m http.server 8000
-
-# Python 2
-python -m SimpleHTTPServer 8000
-```
-
-**Using Node.js:**
-```bash
-npx http-server -p 8000
-```
-
-**Using PHP:**
-```bash
-php -S localhost:8000
-```
-
-4. Open your browser and navigate to `http://localhost:8000`
-5. Click the install button in settings to install as a PWA
-
-### Option 2: Deploy to Web Host
-
-Upload all files to any web hosting service (GitHub Pages, Netlify, Vercel, etc.)
 
 ## Usage
 
@@ -130,7 +96,7 @@ Recommended: Chrome, Firefox, Safari, Edge (latest versions)
 
 ## Privacy
 
-Verk stores all data locally in your browser using localStorage. No data is sent to any server. Your information stays on your device unless you choose to export it.
+Verk™ stores all data locally in your browser using localStorage. No data is sent to any server. Your information stays on your device unless you choose to export it.
 
 ## Contributing
 

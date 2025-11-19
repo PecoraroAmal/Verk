@@ -1,10 +1,10 @@
-const CACHE_NAME = 'verk-v1';
+const CACHE_NAME = 'verk-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/manifest.json'
+  './',
+  'index.html',
+  'styles.css',
+  'app.js',
+  'icons/site.webmanifest'
 ];
 
 self.addEventListener('install', (event) => {

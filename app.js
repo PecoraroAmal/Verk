@@ -36,9 +36,12 @@ class VerkApp {
             } catch (e) {
                 console.error('Error loading data:', e);
                 this.items = this.getDefaultItems();
+                this.saveData();
             }
         } else {
             this.items = this.getDefaultItems();
+            // Persist defaults so they appear under Application > Local Storage
+            this.saveData();
         }
     }
 
