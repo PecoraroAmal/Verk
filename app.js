@@ -260,7 +260,6 @@ class VerkApp {
         document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
         document.getElementById('importFile').addEventListener('change', (e) => this.importData(e));
         document.getElementById('downloadSampleBtn').addEventListener('click', () => this.downloadSample());
-        document.getElementById('clearCacheBtn').addEventListener('click', () => this.clearCache());
         const clearAllBtn = document.getElementById('clearAllDataBtn');
         if (clearAllBtn) clearAllBtn.addEventListener('click', () => this.clearAllData());
 
@@ -620,29 +619,6 @@ class VerkApp {
 
     downloadJSON() {
         this.exportData();
-    }
-
-    async clearCache() {
-        const isHttpContext = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-        if (!isHttpContext) {
-            this.showNotification('Cache management requires running over http(s). Use a local server.', 'error');
-            console.warn('Clear cache skipped: unsupported protocol', location.protocol);
-            return;
-        }
-        try {
-            if ('caches' in window) {
-                const cacheNames = await caches.keys();
-                await Promise.all(cacheNames.map(name => caches.delete(name)));
-            }
-            if ('serviceWorker' in navigator) {
-                const registrations = await navigator.serviceWorker.getRegistrations();
-                await Promise.all(registrations.map(reg => reg.unregister()));
-            }
-            this.showNotification('Browser cache cleared! Your data is safe in localStorage. Reload to re-register service worker.', 'success');
-        } catch (error) {
-            this.showNotification('Error clearing cache', 'error');
-            console.error('Clear cache error:', error);
-        }
     }
 
     showNotification(message, type = 'success') {
