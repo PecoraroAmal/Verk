@@ -902,6 +902,15 @@ class VerkApp {
         document.body.classList.remove('modal-open');
     }
 
+    editCurrentItem() {
+        const itemId = document.getElementById('detailModal').dataset.itemId;
+        const item = this.items.find(i => i.id === itemId);
+        if (item) {
+            this.closeDetailModal();
+            this.openModal(item);
+        }
+    }
+
     async deleteCurrentItem() {
         const itemId = document.getElementById('detailModal').dataset.itemId;
         const item = this.items.find(i => i.id === itemId);
@@ -1058,7 +1067,7 @@ class VerkApp {
             const originalIndex = this.currentPopularItems.indexOf(item);
             const itemWithIndex = { ...item, originalIndex };
             
-            if (item.note && (item.note.includes('saga') || item.note.includes('trilogy') || item.note.includes('series') || item.note.includes('MCU') || item.note.includes('Harry Potter')|| item.note.includes('Christopher Nolan')|| item.note.includes('Tarantino') || item.note.includes('The Lord of the Rings') || item.note.includes('Hayao Miyazaki saga') || item.note.includes('Martin Scorsese'))) {
+            if (item.note && (item.note.includes('saga') || item.note.includes('trilogy') || item.note.includes('series') || item.note.includes('MCU') || item.note.includes('Harry Potter')|| item.note.includes('Christopher Nolan')|| item.note.includes('Quentin Tarantino') || item.note.includes('The Lord of the Rings') || item.note.includes('Hayao Miyazaki saga') || item.note.includes('Martin Scorsese')|| item.note.includes('David Fincher'))) {
                 const sagaName = item.note;
                 if (!sagas[sagaName]) {
                     sagas[sagaName] = [];
