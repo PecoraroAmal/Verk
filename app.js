@@ -89,7 +89,7 @@ class VerkApp {
                 rating: 0,
                 status: 'watched',
                 firstDate: '2024-11-20',
-                repeats: 0,
+                repeats: 5,
                 comment: null,
                 note: null,
                 colour: '#2c3e50',

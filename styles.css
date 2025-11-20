@@ -490,7 +490,7 @@ main {
     font-weight: 600;
 }
 
-.modal-body { padding: 1.5rem; font-size: 1.05rem; line-height: 1.6; }
+.modal-body { padding: 1.5rem 2rem; font-size: 1.05rem; line-height: 1.6; }
 
 .modal-actions {
     display: flex;
@@ -836,8 +836,8 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
     .items-grid { grid-template-columns: 1fr; gap: 0.875rem; }
     .filter-select, .search-input { width: 100%; }
     .modal-content { max-height: 95vh; border-radius: 16px; }
-    .detail-row { flex-direction: column; gap: 0.25rem; }
-    .detail-label { min-width: auto; }
+    .detail-row { flex-direction: row; gap: 0.5rem; }
+    .detail-label { min-width: auto; flex-shrink: 0; }
     .form-actions { flex-direction: column-reverse; gap: 0.875rem; }
     .form-actions button { width: 100%; }
     .theme-toggle { flex-direction: column; }
