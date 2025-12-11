@@ -136,32 +136,6 @@ class VerkApp {
             },
             {
                 id: this.generateId(),
-                category: 'anime',
-                name: 'Baki',
-                rating: 0,
-                status: 'watched',
-                firstDate: '2024-11-20',
-                repeats: 0,
-                comment: null,
-                note: null,
-                colour: '#e67e22',
-                favorite: true
-            },
-            {
-                id: this.generateId(),
-                category: 'manga',
-                name: 'Ajin',
-                rating: 0,
-                status: 'read',
-                firstDate: '2024-11-20',
-                repeats: 0,
-                comment: null,
-                note: null,
-                colour: '#34495e',
-                favorite: false
-            },
-            {
-                id: this.generateId(),
                 category: 'manga',
                 name: 'Solo Leveling',
                 rating: 0,
