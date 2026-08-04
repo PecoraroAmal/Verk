@@ -39,6 +39,32 @@ app.post('/api/data', async (req, res) => {
 
 app.use(express.static(__dirname));
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Verk server listening on http://0.0.0.0:${PORT}`);
+// --- Auto-spegnimento per inattività ---
+const IDLE_TIMEOUT_MS = 5 * 60 * 1000; // 10 minuti
+let idleTimer;
+
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    console.log('Inattivo da 5 minuti, chiusura...');
+    process.exit(0);
+  }, IDLE_TIMEOUT_MS);
+}
+
+app.use((req, res, next) => {
+  resetIdleTimer();
+  next();
 });
+
+// --- Avvio: socket activation (systemd) o porta diretta (test manuale) ---
+if (process.env.LISTEN_FDS) {
+  app.listen({ fd: 3 }, () => {
+    console.log('Verk avviato via socket activation (systemd)');
+  });
+} else {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Verk server listening on http://0.0.0.0:${PORT}`);
+  });
+}
+
+resetIdleTimer();

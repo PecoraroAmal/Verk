@@ -1,6 +1,6 @@
-# Verk™ — Live: https://pecoraroamal.github.io/Verk/
+# Verk™
 
-**Verk™** (Swedish for "works") is a Progressive Web App (PWA) for tracking all your media and reading in one place.
+**Verk™** (Swedish for "works") is a Progressive Web App (PWA) for tracking all your media and reading in one place. It runs as a self-hosted Node.js/Express app, with your library data stored server-side.
 
 ## Features
 
@@ -28,16 +28,38 @@
 - Intuitive user interface in UK English
 
 💾 **Data Management:**
-- All data stored locally in your browser
+- Data stored server-side in a JSON file, served through a small Express API
 - Export data as JSON
 - Import data from JSON files
 - Default example items (can be deleted)
 
 📲 **Progressive Web App:**
 - Install on any device
-- Works offline
+- Works offline (once loaded, via the service worker)
 - Fast and reliable
 - Native app experience
+
+## Running Verk
+
+Verk needs its Node.js server running to load and save data — it's not a static, GitHub-Pages-only app.
+
+### Requirements
+
+- Node.js and npm
+
+### Install & Run
+
+```
+npm install
+npm start
+```
+
+By default the server listens on port 3000 (override with the `PORT` environment variable). Then open `http://localhost:3000` (or your server's address) in a browser.
+
+### Deployment notes
+
+- Supports systemd socket activation (`LISTEN_FDS`) for on-demand hosting setups (e.g. Oracle Cloud).
+- The server automatically shuts itself down after 5 minutes of inactivity, so it's meant to be relaunched on demand (e.g. via a socket-activated systemd service) rather than run as a permanently idling process.
 
 ## Usage
 
@@ -70,7 +92,7 @@
 
 ### Themes
 
-Choose between Light, Dark, or Auto (follows system preference) in Settings
+Choose between Light, Dark, or Auto (follows system preference) in Settings. The theme choice is stored locally in your browser (`localStorage`); all other data lives on the server.
 
 ## File Structure
 
@@ -78,25 +100,28 @@ Choose between Light, Dark, or Auto (follows system preference) in Settings
 Verk/
 ├── index.html          # Main HTML file
 ├── styles.css          # Styling and themes
-├── app.js              # Application logic
+├── app.js              # Application logic (client)
+├── server.js           # Express server: static hosting + /api/data
 ├── manifest.json       # PWA manifest
-├── service-worker.js   # Service worker for offline support
-├── icons/              # App icons (72-512px)
-└── README.md           # This file
+├── sw.js               # Service worker for offline support
+├── data/                # verk-data.json lives here (created at runtime, git-ignored)
+├── icons/               # App icons (72-512px)
+├── package.json
+└── README.md            # This file
 ```
 
 ## Browser Support
 
 Works on all modern browsers that support:
-- localStorage
 - Service Workers
 - ES6+ JavaScript
+- Fetch API
 
 Recommended: Chrome, Firefox, Safari, Edge (latest versions)
 
 ## Privacy
 
-Verk™ stores all data locally in your browser using localStorage. No data is sent to any server. Your information stays on your device unless you choose to export it.
+Your library data is stored server-side, in the `data/verk-data.json` file on whichever machine runs the Verk server — it is not sent to any third party. Only your theme preference is kept in the browser's `localStorage`. Use the Export/Import features in Settings to back up or move your data.
 
 ## Contributing
 
@@ -104,7 +129,7 @@ This is a personal project, but suggestions and improvements are welcome via Git
 
 ## Licence
 
-MIT Licence - Feel free to use and modify as needed.
+Verk™ is distributed under a custom licence — see [LICENCE](LICENCE) for the full text. In short: the source code must remain open and unobfuscated in any distribution, modified copies must carry attribution to the original author, and the "Verk" name/branding may not be reused for derivative works. Commercial use of modified versions is permitted under those conditions.
 
 ## Author
 
