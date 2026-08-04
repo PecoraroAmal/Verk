@@ -1,0 +1,13 @@
+{
+  "name": "verk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Verk - PWA for tracking films, TV series, anime, cartoons, books and manga",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

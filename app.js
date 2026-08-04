@@ -7,8 +7,8 @@ class VerkApp {
         this.init();
     }
 
-    init() {
-        this.loadData();
+    async init() {
+        await this.loadData();
         this.setupEventListeners();
         this.applyTheme();
         this.renderItems();
@@ -59,25 +59,42 @@ class VerkApp {
         }
     }
     // Data Management
-    loadData() {
-        const savedData = localStorage.getItem('verkItems');
-        if (savedData) {
-            try {
-                this.items = JSON.parse(savedData);
-            } catch (e) {
-                console.error('Error loading data:', e);
+    async loadData() {
+        try {
+            const res = await fetch('/api/data');
+            if (!res.ok) throw new Error('Server error: ' + res.status);
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                this.items = data;
+            } else {
                 this.items = this.getDefaultItems();
-                this.saveData();
+                // Persist defaults so they appear on first run
+                await this.saveData();
             }
-        } else {
-            this.items = this.getDefaultItems();
-            // Persist defaults so they appear under Application > Local Storage
-            this.saveData();
+        } catch (e) {
+            console.error('Error loading data:', e);
+            this.items = [];
+            await this.messageDialog(
+                'Unable to load data from the server. Check that the server is running and reload the page.',
+                { title: 'Connection Error', okText: 'OK' }
+            );
         }
     }
 
-    saveData() {
-        localStorage.setItem('verkItems', JSON.stringify(this.items));
+    async saveData() {
+        try {
+            const res = await fetch('/api/data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(this.items)
+            });
+            if (!res.ok) throw new Error('Server error: ' + res.status);
+            return true;
+        } catch (e) {
+            console.error('Error saving data:', e);
+            this.showNotification('Unable to save changes: check server connection.', 'error');
+            return false;
+        }
     }
 
     getDefaultItems() {
@@ -428,7 +445,7 @@ class VerkApp {
         }
     }
 
-    handleFormSubmit(e) {
+    async handleFormSubmit(e) {
         e.preventDefault();
 
         const formData = {
@@ -456,7 +473,7 @@ class VerkApp {
             this.items.unshift(formData);
         }
 
-        this.saveData();
+        await this.saveData();
         this.renderItems();
         this.closeModal();
     }
@@ -484,7 +501,7 @@ class VerkApp {
         document.body.classList.remove('modal-open');
     }
 
-    handleQuickAddSubmit(e) {
+    async handleQuickAddSubmit(e) {
         e.preventDefault();
         
         const name = document.getElementById('quickItemName').value.trim();
@@ -510,10 +527,12 @@ class VerkApp {
         };
 
         this.items.unshift(newItem);
-        this.saveData();
+        const saved = await this.saveData();
         this.renderItems();
         this.closeQuickAddModal();
-        this.showNotification(`"${name}" added to ${this.formatCategory(category)}!`, 'success');
+        if (saved) {
+            this.showNotification(`"${name}" added to ${this.formatCategory(category)}!`, 'success');
+        }
     }
 
     // Settings
@@ -565,14 +584,16 @@ class VerkApp {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             try {
                 const importedData = JSON.parse(event.target.result);
                 if (Array.isArray(importedData)) {
                     this.items = importedData;
-                    this.saveData();
+                    const saved = await this.saveData();
                     this.renderItems();
-                    this.showNotification('Data imported successfully!', 'success');
+                    if (saved) {
+                        this.showNotification('Data imported successfully!', 'success');
+                    }
                 } else {
                     this.showNotification('Invalid JSON format. Expected an array of items.', 'error');
                 }
@@ -776,11 +797,11 @@ class VerkApp {
         this.filterItems();
     }
 
-    toggleFavorite(itemId) {
+    async toggleFavorite(itemId) {
         const item = this.items.find(i => i.id === itemId);
         if (item) {
             item.favorite = !item.favorite;
-            this.saveData();
+            await this.saveData();
             this.renderItems();
         }
     }
@@ -939,13 +960,15 @@ class VerkApp {
         if (!ok) return;
 
         this.items = this.items.filter(i => i.id !== itemId);
-        this.saveData();
+        const saved = await this.saveData();
         this.renderItems();
         this.closeDetailModal();
-        this.showNotification('Item deleted successfully', 'success');
+        if (saved) {
+            this.showNotification('Item deleted successfully', 'success');
+        }
     }
 
-    // Clear All Data (localStorage)
+    // Clear All Data
     async clearAllData() {
         const ok = await this.confirmDialog('This will delete ALL your data. This cannot be undone. Continue?', {
             title: 'Clear All Data',
@@ -955,9 +978,12 @@ class VerkApp {
         });
         if (!ok) return;
 
+        this.items = [];
+        const saved = await this.saveData();
+        if (!saved) return;
+
         try {
             // Prefer clearing the entire origin storage for this app
-            try { localStorage.removeItem('verkItems'); } catch {}
             try { localStorage.removeItem('verkTheme'); } catch {}
             try { localStorage.removeItem('verkMobilePromptDismissed'); } catch {}
             // As a stronger fallback, clear all localStorage for this origin
@@ -966,7 +992,6 @@ class VerkApp {
             console.warn('localStorage clear error:', e);
         }
 
-        this.items = [];
         this.renderItems();
         await this.messageDialog('All data has been cleared', { title: 'Cleared', okText: 'OK' });
         location.reload();
@@ -1188,13 +1213,13 @@ class VerkApp {
         `;
     }
 
-    addPopularItem(item, button) {
+    async addPopularItem(item, button) {
         const itemId = button.dataset.itemId;
-        
+
         // If already added, remove it
         if (itemId) {
             this.items = this.items.filter(i => i.id !== itemId);
-            this.saveData();
+            await this.saveData();
             this.renderItems();
             this.renderPopularItems(this.currentPopularItems);
             return;
@@ -1219,12 +1244,12 @@ class VerkApp {
         };
 
         this.items.unshift(newItem);
-        this.saveData();
+        await this.saveData();
         this.renderItems();
         this.renderPopularItems(this.currentPopularItems);
     }
 
-    addSaga(sagaName, button) {
+    async addSaga(sagaName, button) {
         const sagaItems = this.currentPopularItems.filter(item => item.note === sagaName);
         const today = new Date().toISOString().split('T')[0];
         
@@ -1250,8 +1275,8 @@ class VerkApp {
                 this.items.unshift(newItem);
             }
         });
-        
-        this.saveData();
+
+        await this.saveData();
         this.renderItems();
         this.renderPopularItems(this.currentPopularItems);
     }

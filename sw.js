@@ -59,6 +59,14 @@ self.addEventListener('activate', event => {
 // Fetch event: Serve from cache or fetch from network if online
 self.addEventListener('fetch', event => {
   console.log('Service Worker: Fetching', event.request.url);
+
+  // Never cache API calls: data must always come from the server, not a stale cache
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then(cachedResponse => {
