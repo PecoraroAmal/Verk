@@ -883,6 +883,14 @@ class VerkApp {
             return matchesCategory && matchesStatus && matchesSearch && matchesFavorite;
         });
 
+        // Most recent First Viewing/Reading first; items without a date go last
+        filtered.sort((a, b) => {
+            if (!a.firstDate && !b.firstDate) return 0;
+            if (!a.firstDate) return 1;
+            if (!b.firstDate) return -1;
+            return b.firstDate.localeCompare(a.firstDate);
+        });
+
         this.displayItems(filtered);
     }
 
