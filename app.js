@@ -59,17 +59,33 @@ class VerkApp {
         }
     }
     // Data Management
+    async apiRequest(url, options) {
+        try {
+            const res = await fetch(url, options);
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || `Server error: ${res.status}`);
+            }
+            return res.status === 204 ? null : await res.json();
+        } catch (e) {
+            console.error('API error:', e);
+            this.showNotification('Unable to save changes: check server connection.', 'error');
+            throw e;
+        }
+    }
+
     async loadData() {
         try {
-            const res = await fetch('/api/data');
-            if (!res.ok) throw new Error('Server error: ' + res.status);
-            const data = await res.json();
+            const data = await this.apiRequest('/api/items');
             if (Array.isArray(data) && data.length > 0) {
                 this.items = data;
             } else {
-                this.items = this.getDefaultItems();
                 // Persist defaults so they appear on first run
-                await this.saveData();
+                this.items = await this.apiRequest('/api/items/bulk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ items: this.getDefaultItems() })
+                });
             }
         } catch (e) {
             console.error('Error loading data:', e);
@@ -81,26 +97,9 @@ class VerkApp {
         }
     }
 
-    async saveData() {
-        try {
-            const res = await fetch('/api/data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(this.items)
-            });
-            if (!res.ok) throw new Error('Server error: ' + res.status);
-            return true;
-        } catch (e) {
-            console.error('Error saving data:', e);
-            this.showNotification('Unable to save changes: check server connection.', 'error');
-            return false;
-        }
-    }
-
     getDefaultItems() {
         return [
             {
-                id: this.generateId(),
                 category: 'films',
                 name: 'Interstellar',
                 rating: 0,
@@ -113,7 +112,6 @@ class VerkApp {
                 favorite: true
             },
             {
-                id: this.generateId(),
                 category: 'tv-series',
                 name: 'This is Us',
                 rating: 0,
@@ -126,7 +124,6 @@ class VerkApp {
                 favorite: true
             },
             {
-                id: this.generateId(),
                 category: 'anime',
                 name: 'Detective Conan',
                 rating: 0,
@@ -139,7 +136,6 @@ class VerkApp {
                 favorite: true
             },
             {
-                id: this.generateId(),
                 category: 'anime',
                 name: 'Violet Evergarden',
                 rating: 0,
@@ -152,7 +148,6 @@ class VerkApp {
                 favorite: true
             },
             {
-                id: this.generateId(),
                 category: 'manga',
                 name: 'Solo Leveling',
                 rating: 0,
@@ -165,7 +160,6 @@ class VerkApp {
                 favorite: true
             },
             {
-                id: this.generateId(),
                 category: 'books',
                 name: 'Cuore',
                 rating: 0,
@@ -178,7 +172,6 @@ class VerkApp {
                 favorite: true
             },
             {
-                id: this.generateId(),
                 category: 'cartoons',
                 name: 'Inazuma Eleven',
                 rating: 0,
@@ -191,10 +184,6 @@ class VerkApp {
                 favorite: false
             }
         ];
-    }
-
-    generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2);
     }
 
     // Theme Management
@@ -251,6 +240,9 @@ class VerkApp {
         document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
         document.getElementById('importFile').addEventListener('change', (e) => this.importData(e));
         document.getElementById('downloadSampleBtn').addEventListener('click', () => this.downloadSample());
+        document.getElementById('exportDbBtn').addEventListener('click', () => this.exportDb());
+        document.getElementById('importDbBtn').addEventListener('click', () => document.getElementById('importDbFile').click());
+        document.getElementById('importDbFile').addEventListener('change', (e) => this.importDb(e));
         const clearAllBtn = document.getElementById('clearAllDataBtn');
         if (clearAllBtn) clearAllBtn.addEventListener('click', () => this.clearAllData());
 
@@ -449,7 +441,6 @@ class VerkApp {
         e.preventDefault();
 
         const formData = {
-            id: this.currentEditId || this.generateId(),
             category: document.getElementById('itemCategory').value,
             name: document.getElementById('itemName').value.trim(),
             rating: parseFloat(document.getElementById('itemRating').value) || null,
@@ -462,18 +453,29 @@ class VerkApp {
             favorite: this.currentEditId ? (this.items.find(i => i.id === this.currentEditId)?.favorite || false) : false
         };
 
-        if (this.currentEditId) {
-            // Update existing item
-            const index = this.items.findIndex(item => item.id === this.currentEditId);
-            if (index !== -1) {
-                this.items[index] = formData;
+        try {
+            if (this.currentEditId) {
+                // Update existing item
+                const updated = await this.apiRequest(`/api/items/${this.currentEditId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const index = this.items.findIndex(item => item.id === this.currentEditId);
+                if (index !== -1) this.items[index] = updated;
+            } else {
+                // Add new item
+                const created = await this.apiRequest('/api/items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                this.items.unshift(created);
             }
-        } else {
-            // Add new item
-            this.items.unshift(formData);
+        } catch (e) {
+            return;
         }
 
-        await this.saveData();
         this.renderItems();
         this.closeModal();
     }
@@ -513,7 +515,6 @@ class VerkApp {
         const today = new Date().toISOString().split('T')[0];
 
         const newItem = {
-            id: this.generateId(),
             category: category,
             name: name,
             rating: null,
@@ -526,13 +527,21 @@ class VerkApp {
             favorite: false
         };
 
-        this.items.unshift(newItem);
-        const saved = await this.saveData();
+        let created;
+        try {
+            created = await this.apiRequest('/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newItem)
+            });
+        } catch (e) {
+            return;
+        }
+
+        this.items.unshift(created);
         this.renderItems();
         this.closeQuickAddModal();
-        if (saved) {
-            this.showNotification(`"${name}" added to ${this.formatCategory(category)}!`, 'success');
-        }
+        this.showNotification(`"${name}" added to ${this.formatCategory(category)}!`, 'success');
     }
 
     // Settings
@@ -574,9 +583,8 @@ class VerkApp {
     }
 
     exportData() {
-        const dataStr = JSON.stringify(this.items, null, 2);
-        const filename = `verk-backup-${new Date().toISOString().split('T')[0]}.json`;
-        this.downloadBlob(filename, dataStr);
+        // Server generates the snapshot straight from the database
+        window.location.href = '/api/export';
     }
 
     importData(e) {
@@ -585,25 +593,72 @@ class VerkApp {
 
         const reader = new FileReader();
         reader.onload = async (event) => {
+            let importedData;
             try {
-                const importedData = JSON.parse(event.target.result);
-                if (Array.isArray(importedData)) {
-                    this.items = importedData;
-                    const saved = await this.saveData();
-                    this.renderItems();
-                    if (saved) {
-                        this.showNotification('Data imported successfully!', 'success');
-                    }
-                } else {
-                    this.showNotification('Invalid JSON format. Expected an array of items.', 'error');
-                }
+                importedData = JSON.parse(event.target.result);
             } catch (error) {
                 this.showNotification('Error importing data. Please check the file format.', 'error');
                 console.error('Import error:', error);
+                return;
             }
+            if (!Array.isArray(importedData)) {
+                this.showNotification('Invalid JSON format. Expected an array of items.', 'error');
+                return;
+            }
+
+            try {
+                await this.apiRequest('/api/import', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(importedData)
+                });
+            } catch (error) {
+                return;
+            }
+
+            await this.loadData();
+            this.renderItems();
+            this.showNotification('Data imported successfully!', 'success');
         };
         reader.readAsText(file);
         e.target.value = '';
+    }
+
+    exportDb() {
+        // Server generates a consistent SQLite snapshot from the live database
+        window.location.href = '/api/export/db';
+    }
+
+    async importDb(e) {
+        const file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+
+        const ok = await this.confirmDialog(
+            'This will replace the ENTIRE database with the uploaded file. This cannot be undone. Continue?',
+            {
+                title: 'Import Database',
+                confirmHtml: '<i class="fas fa-upload"></i> Import',
+                confirmText: 'Import',
+                cancelText: 'Cancel'
+            }
+        );
+        if (!ok) return;
+
+        try {
+            const buffer = await file.arrayBuffer();
+            await this.apiRequest('/api/import/db', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/octet-stream' },
+                body: buffer
+            });
+        } catch (error) {
+            return;
+        }
+
+        await this.loadData();
+        this.renderItems();
+        this.showNotification('Database imported successfully!', 'success');
     }
 
     downloadSample() {
@@ -799,10 +854,18 @@ class VerkApp {
 
     async toggleFavorite(itemId) {
         const item = this.items.find(i => i.id === itemId);
-        if (item) {
-            item.favorite = !item.favorite;
-            await this.saveData();
+        if (!item) return;
+
+        try {
+            const updated = await this.apiRequest(`/api/items/${itemId}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ favorite: !item.favorite })
+            });
+            item.favorite = updated.favorite;
             this.renderItems();
+        } catch (e) {
+            // apiRequest already surfaced a notification
         }
     }
 
@@ -959,13 +1022,16 @@ class VerkApp {
         });
         if (!ok) return;
 
+        try {
+            await this.apiRequest(`/api/items/${itemId}`, { method: 'DELETE' });
+        } catch (e) {
+            return;
+        }
+
         this.items = this.items.filter(i => i.id !== itemId);
-        const saved = await this.saveData();
         this.renderItems();
         this.closeDetailModal();
-        if (saved) {
-            this.showNotification('Item deleted successfully', 'success');
-        }
+        this.showNotification('Item deleted successfully', 'success');
     }
 
     // Clear All Data
@@ -978,9 +1044,12 @@ class VerkApp {
         });
         if (!ok) return;
 
+        try {
+            await this.apiRequest('/api/items', { method: 'DELETE' });
+        } catch (e) {
+            return;
+        }
         this.items = [];
-        const saved = await this.saveData();
-        if (!saved) return;
 
         try {
             // Prefer clearing the entire origin storage for this app
@@ -1218,19 +1287,22 @@ class VerkApp {
 
         // If already added, remove it
         if (itemId) {
+            try {
+                await this.apiRequest(`/api/items/${itemId}`, { method: 'DELETE' });
+            } catch (e) {
+                return;
+            }
             this.items = this.items.filter(i => i.id !== itemId);
-            await this.saveData();
             this.renderItems();
             this.renderPopularItems(this.currentPopularItems);
             return;
         }
-        
+
         // Otherwise, add it
         const today = new Date().toISOString().split('T')[0];
         const isMedia = ['films', 'tv-series', 'anime', 'cartoons'].includes(item.category);
-        
+
         const newItem = {
-            id: this.generateId(),
             category: item.category,
             name: item.name,
             rating: item.rating || null,
@@ -1243,8 +1315,18 @@ class VerkApp {
             favorite: false
         };
 
-        this.items.unshift(newItem);
-        await this.saveData();
+        let created;
+        try {
+            created = await this.apiRequest('/api/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newItem)
+            });
+        } catch (e) {
+            return;
+        }
+
+        this.items.unshift(created);
         this.renderItems();
         this.renderPopularItems(this.currentPopularItems);
     }
@@ -1252,14 +1334,14 @@ class VerkApp {
     async addSaga(sagaName, button) {
         const sagaItems = this.currentPopularItems.filter(item => item.note === sagaName);
         const today = new Date().toISOString().split('T')[0];
-        
+
+        const newItems = [];
         sagaItems.forEach(item => {
             const alreadyExists = this.items.some(i => i.name === item.name && i.category === item.category);
             if (!alreadyExists) {
                 const isMedia = ['films', 'tv-series', 'anime', 'cartoons'].includes(item.category);
-                
-                const newItem = {
-                    id: this.generateId(),
+
+                newItems.push({
                     category: item.category,
                     name: item.name,
                     rating: item.rating || null,
@@ -1270,13 +1352,24 @@ class VerkApp {
                     note: null,
                     colour: item.colour || '#4a90e2',
                     favorite: false
-                };
-                
-                this.items.unshift(newItem);
+                });
             }
         });
 
-        await this.saveData();
+        if (newItems.length === 0) return;
+
+        let created;
+        try {
+            created = await this.apiRequest('/api/items/bulk', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: newItems })
+            });
+        } catch (e) {
+            return;
+        }
+
+        this.items.unshift(...created);
         this.renderItems();
         this.renderPopularItems(this.currentPopularItems);
     }

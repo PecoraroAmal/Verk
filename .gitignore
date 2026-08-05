@@ -1,2 +1,7 @@
 node_modules/
 data/verk-data.json
+data/verk.db
+data/verk.db-wal
+data/verk.db-shm
+data/verk.db-journal
+data/verk.db.bak-*

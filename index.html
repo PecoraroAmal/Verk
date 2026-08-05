@@ -149,6 +149,24 @@
                 </div>
 
                 <div class="settings-section">
+                    <h3>Advanced: Raw Database Backup</h3>
+                    <p class="about-text">Full 1:1 backup/restore of the underlying SQLite file. Importing replaces the entire database.</p>
+                    <div class="setting-item">
+                        <label>Export Database (.db)</label>
+                        <button id="exportDbBtn" class="btn-secondary">
+                            <i class="fas fa-database"></i> Download .db
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <label>Import Database (.db)</label>
+                        <button id="importDbBtn" class="btn-danger">
+                            <i class="fas fa-upload"></i> Upload .db
+                        </button>
+                        <input type="file" id="importDbFile" accept=".db" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="settings-section">
                     <h3>Cookie & Privacy</h3>
                     <div class="setting-item">
                         <p class="about-text">
